@@ -53,16 +53,16 @@ checkErrors (Just conf) =
   else
     return ()
 
-intToBin :: Int -> [Int]
-intToBin 0 = [0]
-intToBin 1 = [1]
-intToBin n = intToBin (n `div` 2) ++ [n `mod` 2]
+toBin :: Int -> [Int]
+toBin 0 = [0]
+toBin 1 = [1]
+toBin n = toBin (n `div` 2) ++ [n `mod` 2]
 
-binToEightsBytes :: [Int] -> [Int]
-binToEightsBytes [] = []
-binToEightsBytes (x:xs) = if (length xs < 7)
+eightsBytes :: [Int] -> [Int]
+eightsBytes [] = []
+eightsBytes (x:xs) = if (length xs < 7)
   then (replicate (7 - length xs) 0) ++ (x:xs)
-  else x:(binToEightsBytes xs)
+  else x:(eightsBytes xs)
 
 getNextLine :: [Int] -> String -> Char -> String
 getNextLine _ [_] _ = " "
@@ -99,11 +99,9 @@ main = do
   args <- getArgs
   let conf = getOpts defaultConf args
   checkErrors conf
-  let bin = binToEightsBytes (intToBin (fromJust (rule (fromJust conf))))
   size <- size
   let (Window height width) = fromMaybe (Window 80 24) size
   let first = replicate ((width `div` 2) + (move (fromJust conf))) ' ' ++ "*"
   let scd = replicate ((width `div` 2) - 1 - (move (fromJust conf))) ' '
-  let prevLine = first ++ scd
-  wolfram conf prevLine bin 1
-  return ()
+  let line = first ++ scd
+  wolfram conf line (eightsBytes (toBin (fromJust (rule (fromJust conf))))) 1
