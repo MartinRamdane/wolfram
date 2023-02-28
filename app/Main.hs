@@ -89,8 +89,10 @@ getNextLine bin (_:y:z:xs) c = ' ' : getNextLine bin (y:z:xs) c
 wolfram :: Maybe Conf -> String -> [Int] -> Int -> IO ()
 wolfram _ _ [] _ = return ()
 wolfram arg li bin n
-  | n > fromJust (nb_lines (fromJust arg)) = exitWith(ExitSuccess)
-  | otherwise = putStrLn li >> wolfram arg (getNextLine bin li ' ') bin (n + 1)
+  | n >= fromJust (nb_lines (fromJust arg)) + (start (fromJust arg)) = return()
+  | n >= (start (fromJust arg)) =
+    putStrLn li >> wolfram arg (getNextLine bin li ' ') bin (n + 1)
+  | otherwise = wolfram arg (getNextLine bin li ' ') bin (n + 1)
 
 main :: IO ()
 main = do
@@ -103,5 +105,5 @@ main = do
   let first = replicate ((width `div` 2) + (move (fromJust conf))) ' ' ++ "*"
   let scd = replicate ((width `div` 2) - 1 - (move (fromJust conf))) ' '
   let prevLine = first ++ scd
-  wolfram conf prevLine bin 0
+  wolfram conf prevLine bin 1
   return ()
