@@ -33,7 +33,7 @@ getOpts conf [] = Just conf
 getOpts conf ("--rule":xs) =
   getOpts (conf {rule = Just (read (head xs))}) (tail xs)
 getOpts conf ("--start":xs) =
-  getOpts (conf {start = read (head xs)}) (tail xs)
+  getOpts (conf {start = (read (head xs)) + 1}) (tail xs)
 getOpts conf ("--lines":xs) =
   getOpts (conf {nb_lines = Just (read (head xs))}) (tail xs)
 getOpts conf ("--window":xs) =
@@ -102,6 +102,8 @@ nextLine bin (_:y:z:xs) c = c : nextLine bin (y:z:xs) c
 wolfram :: Maybe Conf -> String -> [Int] -> Int -> IO ()
 wolfram _ _ [] _ = return ()
 wolfram arg li bin n
+  | isNothing (nb_lines (fromJust arg)) =
+    putStrLn li >> wolfram arg (nextLine bin li (fChar bin li ' ')) bin (n + 1)
   | n >= fromJust (nb_lines (fromJust arg)) + (start (fromJust arg)) = return()
   | n >= (start (fromJust arg)) =
     putStrLn li >> wolfram arg (nextLine bin li (fChar bin li ' ')) bin (n + 1)
