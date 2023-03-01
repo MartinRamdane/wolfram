@@ -8,7 +8,7 @@
 import System.Environment
 import System.Exit
 import Data.Maybe
-import System.Console.Terminal.Size
+
 import Data.List (unfoldr)
 
 data Conf = Conf {
@@ -114,9 +114,8 @@ main = do
   args <- getArgs
   let conf = getOpts defaultConf args
   checkErrors conf
-  size <- size
-  let (Window height width) = fromMaybe (Window 80 24) size
-  let first = replicate ((width `div` 2) + (move (fromJust conf))) ' ' ++ "*"
-  let scd = replicate ((width `div` 2) - 1 - (move (fromJust conf))) ' '
+  let calc = ((window (fromJust conf)) `div` 2)
+  let first = replicate (calc + (move (fromJust conf))) ' ' ++ "*"
+  let scd = replicate (calc - 1 - (move (fromJust conf))) ' '
   let line = first ++ scd
   wolfram conf line (toBin (fromJust (rule (fromJust conf)))) 1
