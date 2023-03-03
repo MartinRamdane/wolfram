@@ -109,13 +109,22 @@ wolfram arg li bin n
     putStrLn li >> wolfram arg (nextLine bin li (fChar bin li ' ')) bin (n + 1)
   | otherwise = wolfram arg (nextLine bin li (fChar bin li ' ')) bin (n + 1)
 
+getFirst :: Maybe Conf -> String
+getFirst arg = replicate (calc + (move (fromJust arg)) - cell) ' ' ++ "*"
+  where
+    calc = ((window (fromJust arg)) `div` 2)
+    cell = if (window (fromJust arg)) `mod` 2 == 0 then 0 else 1
+
+getScd :: Maybe Conf -> String
+getScd arg = replicate (calc - cell - (move (fromJust arg))) ' '
+  where
+    calc = ((window (fromJust arg)) `div` 2)
+    cell = if (window (fromJust arg)) `mod` 2 == 0 then 1 else -1
+
 main :: IO ()
 main = do
   args <- getArgs
   let conf = getOpts defaultConf args
   checkErrors conf
-  let calc = ((window (fromJust conf)) `div` 2)
-  let first = replicate (calc + (move (fromJust conf))) ' ' ++ "*"
-  let scd = replicate (calc - 1 - (move (fromJust conf))) ' '
-  let line = first ++ scd
+  let line = getFirst conf ++ getScd conf
   wolfram conf line (toBin (fromJust (rule (fromJust conf)))) 1
