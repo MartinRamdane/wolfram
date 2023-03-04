@@ -2,7 +2,7 @@
 -- EPITECH PROJECT, 2023
 -- wolfram.hs
 -- File description:
--- Wolfram
+-- wolfram
 -}
 
 import System.Environment
@@ -99,15 +99,26 @@ nextLine bin (' ':' ':' ':xs) c =
   c : nextLine bin (' ':' ':xs) (if (bin !! 7) == 1 then '*' else ' ')
 nextLine bin (_:y:z:xs) c = c : nextLine bin (y:z:xs) c
 
-wolfram :: Maybe Conf -> String -> [Int] -> Int -> IO ()
-wolfram _ _ [] _ = return ()
-wolfram arg li bin n
+print80char :: Maybe Conf -> String -> Int -> Int -> IO ()
+print80char _ [] _ _= putChar '\n'
+print80char arg (x:xs) n s
+  | n >= s && n < s + (window (fromJust arg)) =
+    putChar x >> print80char arg xs (n + 1) s
+  | n < s + (window (fromJust arg)) = print80char arg xs (n + 1) s
+  | otherwise = putChar '\n'
+
+wolfram :: Maybe Conf -> String -> [Int] -> Int -> Int -> IO ()
+wolfram _ _ [] _ _ = return ()
+wolfram arg li bin n s
   | isNothing (nb_lines (fromJust arg)) =
-    putStrLn li >> wolfram arg (nextLine bin li (fChar bin li ' ')) bin (n + 1)
+    print80char arg li 1 s >>
+    wolfram arg(" "++(nextLine bin li (fChar bin li ' '))++" ")bin (n+1) (s+1)
   | n >= fromJust (nb_lines (fromJust arg)) + (start (fromJust arg)) = return()
   | n >= (start (fromJust arg)) =
-    putStrLn li >> wolfram arg (nextLine bin li (fChar bin li ' ')) bin (n + 1)
-  | otherwise = wolfram arg (nextLine bin li (fChar bin li ' ')) bin (n + 1)
+    print80char arg li 1 s >>
+    wolfram arg (" "++(nextLine bin li (fChar bin li ' '))++" ")bin (n+1) (s+1)
+  | otherwise =
+    wolfram arg (" "++(nextLine bin li (fChar bin li ' '))++" ")bin (n+1) (s+1)
 
 getFirst :: Maybe Conf -> String
 getFirst arg = replicate (calc + (move (fromJust arg)) - cell) ' ' ++ "*"
@@ -127,4 +138,4 @@ main = do
   let conf = getOpts defaultConf args
   checkErrors conf
   let line = getFirst conf ++ getScd conf
-  wolfram conf line (toBin (fromJust (rule (fromJust conf)))) 1
+  wolfram conf line (toBin (fromJust (rule (fromJust conf)))) 1 1

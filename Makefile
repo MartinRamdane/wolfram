@@ -1,6 +1,6 @@
 ##
 ## EPITECH PROJECT, 2023
-## wolfram
+## makefile
 ## File description:
 ## makefile
 ##
