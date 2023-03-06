@@ -28,6 +28,28 @@ defaultConf = Conf {
   move = 0
 }
 
+myIsDigit :: String -> Bool
+myIsDigit [] = True
+myIsDigit "Error" = False
+myIsDigit (x:xs)
+  | x >= '0' && x <= '9' = myIsDigit xs
+  | otherwise = False
+
+getHead :: [String] -> String
+getHead [] = "Error"
+getHead [x] = x
+getHead (x:_) = x
+
+checkErrorsArgs :: [String] -> IO ()
+checkErrorsArgs [] = return ()
+checkErrorsArgs (x:xs)
+  | x == "--rule" && (myIsDigit (getHead xs)) = checkErrorsArgs (tail xs)
+  | x == "--start" && (myIsDigit (getHead xs)) = checkErrorsArgs (tail xs)
+  | x == "--lines" && (myIsDigit (getHead xs)) = checkErrorsArgs (tail xs)
+  | x == "--window" && (myIsDigit (getHead xs)) = checkErrorsArgs (tail xs)
+  | x == "--move" && (myIsDigit (getHead xs)) = checkErrorsArgs (tail xs)
+  | otherwise = exitWith (ExitFailure 84)
+
 getOpts :: Conf -> [String] -> Maybe Conf
 getOpts conf [] = Just conf
 getOpts conf ("--rule":xs) =
@@ -42,9 +64,9 @@ getOpts conf ("--move":xs) =
   getOpts (conf {move = read (head xs)}) (tail xs)
 getOpts _ _ = Nothing
 
-checkErrors :: Maybe Conf -> IO ()
-checkErrors Nothing = exitWith (ExitFailure 84)
-checkErrors (Just conf) =
+checkConf :: Maybe Conf -> IO ()
+checkConf Nothing = exitWith (ExitFailure 84)
+checkConf (Just conf) =
   if (isNothing (rule conf))
     then exitWith (ExitFailure 84)
   else
@@ -135,7 +157,8 @@ getScd arg = replicate (calc - cell - (move (fromJust arg))) ' '
 main :: IO ()
 main = do
   args <- getArgs
+  checkErrorsArgs args
   let conf = getOpts defaultConf args
-  checkErrors conf
+  checkConf conf
   let line = getFirst conf ++ getScd conf
   wolfram conf line (toBin (fromJust (rule (fromJust conf)))) 1 1
