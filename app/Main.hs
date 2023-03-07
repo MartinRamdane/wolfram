@@ -32,7 +32,7 @@ myIsDigit :: String -> Bool
 myIsDigit [] = True
 myIsDigit "Error" = False
 myIsDigit (x:xs)
-  | x >= '0' && x <= '9' = myIsDigit xs
+  | (x >= '0' && x <= '9') || x == '-' = myIsDigit xs
   | otherwise = False
 
 getHead :: [String] -> String
