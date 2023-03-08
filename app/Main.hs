@@ -149,16 +149,14 @@ wolfram arg li bin n s
     wolfram arg (" "++(nextLine bin li (fChar bin li ' '))++" ")bin (n+1) (s+1)
 
 getFirst :: Maybe Conf -> String
-getFirst arg = replicate (calc + (move (fromJust arg)) - cell) ' ' ++ "*"
+getFirst arg = replicate (calc + (move (fromJust arg))) ' ' ++ "*"
   where
     calc = ((window (fromJust arg)) `div` 2)
-    cell = if (window (fromJust arg)) `mod` 2 == 0 then 0 else 1
 
 getScd :: Maybe Conf -> String
-getScd arg = replicate (calc - cell - (move (fromJust arg))) ' '
+getScd arg = replicate (calc - (move (fromJust arg))) ' '
   where
     calc = ((window (fromJust arg)) `div` 2)
-    cell = if (window (fromJust arg)) `mod` 2 == 0 then 1 else -1
 
 main :: IO ()
 main = do
