@@ -31,9 +31,9 @@ defaultConf = Conf {
 myIsDigit :: String -> Bool
 myIsDigit [] = True
 myIsDigit "Error" = False
+myIsDigit ('-':xs) = myIsDigit xs
 myIsDigit (x:xs)
   | (x >= '0' && x <= '9') = myIsDigit xs
-  | x == '-' = myIsDigit xs
   | otherwise = False
 
 getHead :: [String] -> String
@@ -75,6 +75,14 @@ checkConf :: Maybe Conf -> IO ()
 checkConf Nothing = exitWith (ExitFailure 84)
 checkConf (Just conf) =
   if (isNothing (rule conf))
+    then exitWith (ExitFailure 84)
+  else
+    return ()
+
+checkErrorRule :: Maybe Conf -> IO ()
+checkErrorRule Nothing = exitWith (ExitFailure 84)
+checkErrorRule (Just conf) =
+  if (fromJust (rule conf) < 0 || fromJust (rule conf) > 255)
     then exitWith (ExitFailure 84)
   else
     return ()
@@ -165,5 +173,6 @@ main = do
   checkErrorsArgs args
   let conf = getOpts defaultConf args
   checkConf conf
+  checkErrorRule conf
   let line = getFirst conf ++ getScd conf
   wolfram conf line (toBin (fromJust (rule (fromJust conf)))) 1 1
